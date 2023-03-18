@@ -1,0 +1,51 @@
+blueprint:
+  name: Motion Detection Lights
+  description: "Turn on lights when motion is detected and illuminance is below a specified lux level. Turn off the lights after a specified amount of time of inactivity."
+  domain: automation
+  input:
+    motion_sensor:
+      name: Motion Sensor
+      description: The motion sensor to use for the automation
+      selector:
+        entity:
+          domain: binary_sensor
+    light:
+      name: Lights
+      description: The lights that will turn on and off
+      selector:
+        entity:
+          domain: light
+    lux_level:
+      name: Lux Level
+      description: The maximum illuminance level at which the lights should be turned on
+      default: 30
+      selector:
+        number:
+          min: 0
+          max: 1000
+          mode: slider
+          step: 1
+          unit_of_measurement: lux
+    time_period:
+      name: Time Period
+      description: The amount of time of inactivity after which the lights should be turned off
+      default: "00:05:00"
+
+trigger:
+  platform: state
+  entity_id: !input motion_sensor
+  to: "on"
+
+condition:
+  - condition: numeric_state
+    entity_id: sensor.living_room_motion_sensor_illuminance_lux
+    below: !input lux_level
+
+action:
+  - service: light.turn_on
+    entity_id: !input light
+  - delay: !input time_period
+  - service: light.turn_off
+    entity_id: !input light
+
+mode: restart
