@@ -54,7 +54,7 @@ trigger:
 condition:
   - condition: numeric_state
     entity_id: sensor.living_room_motion_sensor_illuminance_lux
-    below: !input lux_level
+    below: !input lux
   - condition: state
     entity_id: input_boolean.detection_enabled
     state: 'on'
