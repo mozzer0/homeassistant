@@ -1,21 +1,31 @@
 blueprint:
-  name: Motion Detection Lights
-  description: "Turn on lights when motion is detected and illuminance is below a specified lux level. Turn off the lights after a specified amount of time of inactivity."
+  name: Motion-activated Light
+  description: Turn on a light when motion is detected.
   domain: automation
+  source_url: https://github.com/mozzer0/homeassistant/blob/main/motionlights.yaml
   input:
-    motion_sensor:
+    motion_entity:
       name: Motion Sensor
-      description: The motion sensor to use for the automation
       selector:
         entity:
           domain: binary_sensor
-    light:
-      name: Lights
-      description: The lights that will turn on and off
+          device_class: motion
+    light_target:
+      name: Light
       selector:
-        entity:
-          domain: light
-    lux_level:
+        target:
+          entity:
+            domain: light
+    no_motion_wait:
+      name: Wait time
+      description: Time to leave the light on after last motion is detected.
+      default: 120
+      selector:
+        number:
+          min: 0
+          max: 3600
+          unit_of_measurement: seconds
+    lux:
       name: Lux Level
       description: The maximum illuminance level at which the lights should be turned on
       default: 30
@@ -26,23 +36,18 @@ blueprint:
           mode: slider
           step: 1
           unit_of_measurement: lux
-    time_period:
-      name: Time Period
-      description: The amount of time of inactivity after which the lights should be turned off
-      default: 120
-      selector:
-        number:
-          min: 0
-          max: 3600
-          unit_of_measurement: seconds
     detection_enabled:
       name: Detection enabled switch
       description: The entity that controls if motion detection is in enabled
 
+# If motion is detected within the delay,
+# we restart the script.
+mode: restart
+max_exceeded: silent
 
 trigger:
   platform: state
-  entity_id: !input motion_sensor
+  entity_id: !input motion_entity
   from: "off"
   to: "on"
 
@@ -57,17 +62,15 @@ condition:
 action:
   - alias: "Turn on the light"
     service: light.turn_on
-    target: !input light
+    target: !input light_target
   - alias: "Wait until there is no motion from device"
     wait_for_trigger:
       platform: state
-      entity_id: !input motion_sensor
+      entity_id: !input motion_entity
       from: "on"
       to: "off"
   - alias: "Wait the number of seconds that has been set"
-    delay: !input time_period
+    delay: !input no_motion_wait
   - alias: "Turn off the light"
     service: light.turn_off
-    target: !input light
-
-mode: restart
+    target: !input light_target
