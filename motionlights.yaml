@@ -36,6 +36,10 @@ blueprint:
       description: The maximum illuminance level at which the lights should be turned on
       default: 30
       selector:
+        number:
+          min: 0
+          max: 10000
+          unit_of_measurement: lux
     detection_enabled:
       name: Detection enabled switch
       description: The entity that controls if motion detection is in enabled
