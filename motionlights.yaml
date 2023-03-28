@@ -29,7 +29,12 @@ blueprint:
     time_period:
       name: Time Period
       description: The amount of time of inactivity after which the lights should be turned off
-      default: "00:05:00"
+      default: 120
+      selector:
+        number:
+          min: 0
+          max: 3600
+          unit_of_measurement: seconds
     detection_enabled:
       name: Detection enabled switch
       description: The entity that controls if motion detection is in enabled
@@ -38,6 +43,7 @@ blueprint:
 trigger:
   platform: state
   entity_id: !input motion_sensor
+  from: "off"
   to: "on"
 
 condition:
@@ -49,10 +55,19 @@ condition:
     state: 'on'
 
 action:
-  - service: light.turn_on
-    entity_id: !input light
-  - delay: !input time_period
-  - service: light.turn_off
-    entity_id: !input light
+  - alias: "Turn on the light"
+    service: light.turn_on
+    target: !input light
+  - alias: "Wait until there is no motion from device"
+    wait_for_trigger:
+      platform: state
+      entity_id: !input motion_sensor
+      from: "on"
+      to: "off"
+  - alias: "Wait the number of seconds that has been set"
+    delay: !input no_motion_wait
+  - alias: "Turn off the light"
+    service: light.turn_off
+    target: !input light
 
 mode: restart
