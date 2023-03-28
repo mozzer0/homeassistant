@@ -45,8 +45,7 @@ blueprint:
       description: The entity that controls if motion detection is in enabled
       selector:
         target:
-          entity:
-            domain: input_boolean
+          domain: input_boolean
 
 # If motion is detected within the delay,
 # we restart the script.
@@ -65,7 +64,7 @@ condition:
       - condition: numeric_state
         entity_id: !input lux_entity
         attribute: illuminance_lux
-        below: !input lux_level
+        below: 30
       - condition: state
         entity_id: !input detection_enabled
         state: "on"
