@@ -30,6 +30,10 @@ blueprint:
       name: Time Period
       description: The amount of time of inactivity after which the lights should be turned off
       default: "00:05:00"
+    detection_enabled:
+      name: Detection enabled switch
+      description: The entity that controls if motion detection is in enabled
+
 
 trigger:
   platform: state
@@ -40,6 +44,9 @@ condition:
   - condition: numeric_state
     entity_id: sensor.living_room_motion_sensor_illuminance_lux
     below: !input lux_level
+  - condition: state
+    entity_id: input_boolean.detection_enabled
+    state: 'on'
 
 action:
   - service: light.turn_on
