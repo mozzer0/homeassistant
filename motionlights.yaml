@@ -65,7 +65,7 @@ action:
       from: "on"
       to: "off"
   - alias: "Wait the number of seconds that has been set"
-    delay: !input no_motion_wait
+    delay: !input time_period
   - alias: "Turn off the light"
     service: light.turn_off
     target: !input light
