@@ -39,6 +39,10 @@ blueprint:
     detection_enabled:
       name: Detection enabled switch
       description: The entity that controls if motion detection is in enabled
+      selector:
+        target:
+          entity:
+            domain: input_boolean
 
 # If motion is detected within the delay,
 # we restart the script.
