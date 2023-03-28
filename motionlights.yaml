@@ -13,8 +13,9 @@ blueprint:
     lux_entity:
       name: Lux Sensor
       selector:
-        entity:
-          domain: sensor
+        target:
+          entity:
+            domain: sensor
     light_target:
       name: Light
       selector:
