@@ -1,0 +1,40 @@
+alias: Kitchen - Motion Lights
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.kitchen_motion_sensor_occupancy
+    from: "off"
+    to: "on"
+condition:
+  - condition: and
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.kitchen_motion_sensor_illuminance_lux
+        attribute: illuminance_lux
+        below: 30
+      - condition: state
+        entity_id: input_boolean.kitchen_motion_detection
+        state: "on"
+action:
+  - service: light.turn_on
+    data: {}
+    target:
+      device_id: 5a52a0aecd6f0ce0356f64da73e1091a
+  - wait_for_trigger:
+      - platform: state
+        entity_id:
+          - binary_sensor.kitchen_motion_sensor_occupancy
+        to: "off"
+        from: "on"
+    continue_on_timeout: false
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      device_id: 5a52a0aecd6f0ce0356f64da73e1091a
+mode: restart
