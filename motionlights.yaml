@@ -10,13 +10,19 @@ blueprint:
         entity:
           domain: binary_sensor
           device_class: motion
+    lux_entity:
+      name: Lux Sensor
+      selector:
+        entity:
+          domain: sensor
+          device_class: illuminance_lux
     light_target:
       name: Light
       selector:
         target:
           entity:
             domain: light
-    no_motion_wait:
+    wait_time:
       name: Wait time
       description: Time to leave the light on after last motion is detected.
       default: 120
@@ -25,17 +31,11 @@ blueprint:
           min: 0
           max: 3600
           unit_of_measurement: seconds
-    lux:
+    lux_level:
       name: Lux Level
       description: The maximum illuminance level at which the lights should be turned on
       default: 30
       selector:
-        number:
-          min: 0
-          max: 1000
-          mode: slider
-          step: 1
-          unit_of_measurement: lux
     detection_enabled:
       name: Detection enabled switch
       description: The entity that controls if motion detection is in enabled
@@ -56,12 +56,15 @@ trigger:
   to: "on"
 
 condition:
-  - condition: numeric_state
-    entity_id: sensor.living_room_motion_sensor_illuminance_lux
-    below: !input lux
-  - condition: state
-    entity_id: input_boolean.detection_enabled
-    state: 'on'
+  - condition: and
+    conditions:
+      - condition: numeric_state
+        entity_id: !input lux_entity
+        attribute: illuminance_lux
+        below: !input lux_level
+      - condition: state
+        entity_id: !input detection_enabled
+        state: "on"
 
 action:
   - alias: "Turn on the light"
@@ -74,7 +77,7 @@ action:
       from: "on"
       to: "off"
   - alias: "Wait the number of seconds that has been set"
-    delay: !input no_motion_wait
+    delay: !input wait_time
   - alias: "Turn off the light"
     service: light.turn_off
     target: !input light_target
