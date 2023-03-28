@@ -63,7 +63,7 @@ condition:
   - condition: and
     conditions:
       - condition: numeric_state
-        entity_id: !input lux_entity
+        entity_id: sensor.kitchen_motion_sensor_illuminance_lux
         attribute: illuminance_lux
         below: 30
       - condition: state
