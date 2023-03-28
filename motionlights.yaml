@@ -45,7 +45,8 @@ blueprint:
       description: The entity that controls if motion detection is in enabled
       selector:
         target:
-          domain: input_boolean
+          entity:
+            domain: input_boolean
 
 # If motion is detected within the delay,
 # we restart the script.
